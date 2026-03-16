@@ -35,7 +35,23 @@ def ensure_delivery_note_state_fields():
 
 
 def _ensure_custom_field(dt: str, spec: dict):
-    if frappe.db.exists("Custom Field", {"dt": dt, "fieldname": spec["fieldname"]}):
+    existing_name = frappe.db.exists("Custom Field", {"dt": dt, "fieldname": spec["fieldname"]})
+    if existing_name:
+        doc = frappe.get_doc("Custom Field", existing_name)
+        changed = False
+        for key, value in (
+            ("label", spec["label"]),
+            ("fieldtype", spec["fieldtype"]),
+            ("insert_after", spec["insert_after"]),
+            ("hidden", 1),
+            ("allow_on_submit", 1),
+            ("no_copy", 1),
+        ):
+            if doc.get(key) != value:
+                doc.set(key, value)
+                changed = True
+        if changed:
+            doc.save(ignore_permissions=True)
         return
 
     doc = frappe.get_doc(
@@ -52,4 +68,3 @@ def _ensure_custom_field(dt: str, spec: dict):
         }
     )
     doc.insert(ignore_permissions=True)
-
