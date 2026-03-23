@@ -105,22 +105,30 @@ def _ensure_custom_field(dt: str, spec: dict):
 
 def _parse_int(value, default):
     try:
-        return int((value or "").strip())
+        if value is None:
+            return default
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                return default
+        return int(value)
     except Exception:
         return default
 
 
 def _delivery_note_ui_status(doc):
+    current_status = (doc.get("accord_ui_status") or "").strip()
     if int(doc.docstatus or 0) != 1:
         return ""
 
     flow_state = _parse_int(doc.get("accord_flow_state"), 0)
     customer_state = _parse_int(doc.get("accord_customer_state"), CUSTOMER_STATE_PENDING)
+    reason = (doc.get("accord_customer_reason") or "").strip()
 
     if flow_state != DELIVERY_FLOW_STATE_SUBMITTED:
         return "pending"
-    if customer_state == CUSTOMER_STATE_CONFIRMED:
-        return "confirm"
-    if customer_state == CUSTOMER_STATE_REJECTED:
+    if customer_state == CUSTOMER_STATE_REJECTED or reason:
         return "rejected"
+    if customer_state == CUSTOMER_STATE_CONFIRMED and current_status == "confirm":
+        return "confirm"
     return "pending"
