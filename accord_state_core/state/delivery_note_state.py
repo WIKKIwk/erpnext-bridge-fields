@@ -43,7 +43,8 @@ def _ensure_custom_field(dt: str, spec: dict):
             ("label", spec["label"]),
             ("fieldtype", spec["fieldtype"]),
             ("insert_after", spec["insert_after"]),
-            ("hidden", 1),
+            ("hidden", 0),
+            ("read_only", 1),
             ("allow_on_submit", 1),
             ("no_copy", 1),
         ):
@@ -62,7 +63,8 @@ def _ensure_custom_field(dt: str, spec: dict):
             "label": spec["label"],
             "fieldtype": spec["fieldtype"],
             "insert_after": spec["insert_after"],
-            "hidden": 1,
+            "hidden": 0,
+            "read_only": 1,
             "allow_on_submit": 1,
             "no_copy": 1,
         }
