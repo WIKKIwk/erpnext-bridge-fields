@@ -4,6 +4,7 @@ DELIVERY_FLOW_STATE_SUBMITTED = 1
 CUSTOMER_STATE_PENDING = 1
 CUSTOMER_STATE_CONFIRMED = 3
 CUSTOMER_STATE_REJECTED = 2
+CUSTOMER_STATE_PARTIAL = 4
 
 
 FIELD_SPECS = (
@@ -47,7 +48,7 @@ FIELD_SPECS = (
         "label": "Accord UI Status",
         "fieldtype": "Select",
         "insert_after": "accord_status_section",
-        "options": "pending\nconfirm\nrejected",
+        "options": "pending\nconfirm\npartial\nrejected",
         "hidden": 0,
     },
 )
@@ -139,6 +140,8 @@ def _delivery_note_ui_status(doc):
 
     if flow_state != DELIVERY_FLOW_STATE_SUBMITTED:
         return "pending"
+    if customer_state == CUSTOMER_STATE_PARTIAL or current_status == "partial":
+        return "partial"
     if customer_state == CUSTOMER_STATE_REJECTED or reason:
         return "rejected"
     if customer_state == CUSTOMER_STATE_CONFIRMED or current_status == "confirm":
